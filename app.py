@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-import pytesseract
+import easyocr
 import re
 
 st.title("HelloFresh Recipe Add-On Demo (OCR)")
@@ -12,12 +12,14 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Recipe', use_column_width=True)
 
-    # Extract text from image
-    text = pytesseract.image_to_string(image)
+    # OCR with EasyOCR
+    reader = easyocr.Reader(['en'])
+    result = reader.readtext(uploaded_file.read())
+    text = " ".join([res[1] for res in result])
     st.write("### Extracted Text:")
     st.write(text)
 
-    # Simple ingredient extraction (split by lines/commas)
+    # Simple ingredient extraction
     ingredients = re.split(r'[\n,]+', text)
     ingredients = [i.strip() for i in ingredients if i.strip() != ""]
     
